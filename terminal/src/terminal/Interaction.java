@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 public class Interaction {
 
+	
 	public static void main(String[] args) throws IOException {
 		String line;
 		Scanner scan = new Scanner(System.in);
@@ -18,31 +19,53 @@ public class Interaction {
 		ProcessBuilder builder = new ProcessBuilder("/bin/bash");
 		builder.redirectErrorStream(true);
 		Process process = builder.start();
-		OutputStream stdin = process.getOutputStream ();
-		InputStream stderr = process.getErrorStream ();
-		InputStream stdout = process.getInputStream ();
+		OutputStream stdin = process.getOutputStream();
+		InputStream stderr = process.getErrorStream();
+		InputStream stdout = process.getInputStream();
 
-		BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
+		/*
+		Thread T=new Thread(new Runnable() {
+
+		    @Override
+		    public void run() {
+		        while(true)
+		        {
+		            String input = scan.nextLine();
+		            input += "\n";
+		            try {
+		                writer.write(input);
+		                writer.flush();
+		            } catch (IOException e) {
+		                // TODO Auto-generated catch block
+		                e.printStackTrace();
+		            }
+
+		        }
+
+		    }
+		} );
+		*/
 
 		while (scan.hasNext()) {
-		    String input = scan.nextLine();
-		    if (input.trim().equals("exit")) {
-		        // Putting 'exit' amongst the echo --EOF--s below doesn't work.
-		        writer.write("exit\n");
-		    } else {
-		        writer.write("((" + input + ") && echo --EOF--) || echo --EOF--\n");
-		    }
-		    writer.flush();
+			String input = scan.nextLine();
+			if (input.trim().equals("exit")) {
+				// Putting 'exit' amongst the echo --EOF--s below doesn't work.
+				writer.write("exit\n");
+			} else {
+				writer.write("((" + input + ") && echo --EOF--) || echo --EOF--\n");
+			}
+			writer.flush();
 
-		    line = reader.readLine();
-		    while (line != null && ! line.trim().equals("--EOF--")) {
-		        System.out.println ("Stdout: " + line);
-		        line = reader.readLine();
-		    }
-		    if (line == null) {
-		        break;
-		    }
+			line = reader.readLine();
+			while (line != null && !line.trim().equals("--EOF--")) {
+				System.out.println("Stdout: " + line);
+				line = reader.readLine();
+			}
+			if (line == null) {
+				break;
+			}
 		}
 	}
 }
